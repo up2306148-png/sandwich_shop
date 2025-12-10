@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 import 'package:sandwich_shop/views/order_screen.dart';
 import 'package:sandwich_shop/views/profile_screen.dart';
+import 'package:sandwich_shop/views/checkout_screen.dart';   // ✅ NEW IMPORT
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
 import 'package:sandwich_shop/repositories/pricing_repository.dart';
@@ -18,6 +19,47 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   void _goBack() {
     Navigator.pop(context);
+  }
+
+  // ===========================
+  // ✅ NEW: Checkout navigation
+  // ===========================
+  Future<void> _navigateToCheckout() async {
+    if (widget.cart.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your cart is empty'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CheckoutScreen(cart: widget.cart),
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() {
+        widget.cart.clear();
+      });
+
+      final String orderId = result['orderId'] as String;
+      final String estimatedTime = result['estimatedTime'] as String;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Order $orderId confirmed! Estimated time: $estimatedTime'),
+          duration: const Duration(seconds: 4),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context);
+    }
   }
 
   String _getSizeText(bool isFootlong) {
@@ -49,7 +91,6 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
 
-      // ✅ Drawer added (same structure as OrderScreen)
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -61,8 +102,10 @@ class _CartScreenState extends State<CartScreen> {
                   SizedBox(
                     width: 56,
                     height: 56,
-                    child: Image.asset('assets/images/logo.png',
-                        fit: BoxFit.contain),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Text('Menu', style: heading1),
@@ -133,6 +176,19 @@ class _CartScreenState extends State<CartScreen> {
                 style: heading2,
                 textAlign: TextAlign.center,
               ),
+
+              const SizedBox(height: 20),
+
+              // ===========================
+              // ✅ NEW: Checkout Button
+              // ===========================
+              if (widget.cart.items.isNotEmpty)
+                StyledButton(
+                  onPressed: _navigateToCheckout,
+                  icon: Icons.payment,
+                  label: 'Checkout',
+                  backgroundColor: Colors.orange,
+                ),
 
               const SizedBox(height: 20),
 
