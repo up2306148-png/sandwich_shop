@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 import 'package:sandwich_shop/views/order_screen.dart';
+import 'package:sandwich_shop/views/profile_screen.dart';
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
 import 'package:sandwich_shop/repositories/pricing_repository.dart';
@@ -11,9 +12,7 @@ class CartScreen extends StatefulWidget {
   const CartScreen({super.key, required this.cart});
 
   @override
-  State<CartScreen> createState() {
-    return _CartScreenState();
-  }
+  State<CartScreen> createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
@@ -22,11 +21,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   String _getSizeText(bool isFootlong) {
-    if (isFootlong) {
-      return 'Footlong';
-    } else {
-      return 'Six-inch';
-    }
+    return isFootlong ? 'Footlong' : 'Six-inch';
   }
 
   double _getItemPrice(Sandwich sandwich, int quantity) {
@@ -53,12 +48,70 @@ class _CartScreenState extends State<CartScreen> {
           style: heading1,
         ),
       ),
+
+      // ✅ Drawer added (same structure as OrderScreen)
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Image.asset('assets/images/logo.png',
+                        fit: BoxFit.contain),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Menu', style: heading1),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.restaurant_menu),
+              title: const Text('Order', style: normalText),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => const OrderScreen(maxQuantity: 10),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile', style: normalText),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('Cart', style: normalText),
+              selected: true,
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
+
               for (MapEntry<Sandwich, int> entry in widget.cart.items.entries)
                 Column(
                   children: [
@@ -74,18 +127,22 @@ class _CartScreenState extends State<CartScreen> {
                     const SizedBox(height: 20),
                   ],
                 ),
+
               Text(
                 'Total: £${widget.cart.totalPrice.toStringAsFixed(2)}',
                 style: heading2,
                 textAlign: TextAlign.center,
               ),
+
               const SizedBox(height: 20),
+
               StyledButton(
                 onPressed: _goBack,
                 icon: Icons.arrow_back,
                 label: 'Back to Order',
                 backgroundColor: Colors.grey,
               ),
+
               const SizedBox(height: 20),
             ],
           ),
