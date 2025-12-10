@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sandwich_shop/views/app_styles.dart';
 import 'package:sandwich_shop/views/cart_screen.dart';
+import 'package:sandwich_shop/views/profile_screen.dart';
 import 'package:sandwich_shop/models/cart.dart';
 import 'package:sandwich_shop/models/sandwich.dart';
 
@@ -133,6 +134,44 @@ class _OrderScreenState extends State<OrderScreen> {
         title: const Text(
           'Sandwich Counter',
           style: heading1,
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Image.asset('assets/images/logo.png',
+                        fit: BoxFit.contain),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Menu', style: heading1),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile', style: normalText),
+              onTap: () {
+                Navigator.pop(context); // close drawer first
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+            // ... you can add more navigation items here ...
+          ],
         ),
       ),
       body: Center(
